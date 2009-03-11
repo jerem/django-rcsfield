@@ -64,7 +64,7 @@ class RcsTextField(models.TextField):
         data = getattr(instance, self.attname)
         key = self.rcskey_format % (instance._meta.app_label,
                                     instance.__class__.__name__,
-                                    self.attname,instance.id)
+                                    self.attname,instance.pk)
         try:
             backend.commit(key, data.encode('utf-8'))
         except:
@@ -81,14 +81,14 @@ class RcsTextField(models.TextField):
         return backend.get_revisions(self.rcskey_format % (instance._meta.app_label,
                                                            instance.__class__.__name__,
                                                            field.attname,
-                                                           instance.id))
+                                                           instance.pk))
 
 
     def get_FIELD_revisions(self, instance, field):
         return backend.get_revisions(self.rcskey_format % (instance._meta.app_label,
                                                            instance.__class__.__name__,
                                                            field.attname,
-                                                           instance.id))
+                                                           instance.pk))
 
 
     def get_FIELD_diff(self, instance, rev1, rev2=None, field=None):
@@ -119,7 +119,7 @@ class RcsTextField(models.TextField):
             old = backend.fetch(self.rcskey_format % (instance._meta.app_label,
                                                       instance.__class__.__name__,
                                                       field.attname,
-                                                      instance.id),
+                                                      instance.pk),
                                 rev1,
                                )
             diff = difflib.unified_diff(old.splitlines(1),
@@ -133,12 +133,12 @@ class RcsTextField(models.TextField):
             return backend.diff(self.rcskey_format % (instance._meta.app_label,
                                                       instance.__class__.__name__,
                                                       field.attname,
-                                                      instance.id),
+                                                      instance.pk),
                                 rev1,
                                 self.rcskey_format % (instance._meta.app_label,
                                                       instance.__class__.__name__,
                                                       field.attname,
-                                                      instance.id),
+                                                      instance.pk),
                                 rev2,
                                )
 
@@ -194,7 +194,7 @@ class RcsJsonField(RcsTextField):
         data = getattr(instance, self.attname)
         key = self.rcskey_format % (instance._meta.app_label,
                                     instance.__class__.__name__,
-                                    self.attname,instance.id)
+                                    self.attname,instance.pk)
         try:
             backend.commit(key, json.dumps(data)) #.decode().encode('utf-8'))
         except:
