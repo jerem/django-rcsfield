@@ -80,10 +80,12 @@ class RcsTextField(models.TextField):
         """
         revs = []
         for field in instance._meta.fields:
-            revs.extend(backend.get_revisions(self.rcskey_format % (instance._meta.app_label,
-                                                           instance.__class__.__name__,
-                                                           field.attname,
-                                                           instance.pk)))
+            if hasattr(field, 'IS_VERSIONED') and field.IS_VERSIONED:
+                revs.extend(backend.get_revisions(self.rcskey_format % (
+                                                    instance._meta.app_label,
+                                                    instance.__class__.__name__,
+                                                    field.attname,
+                                                    instance.pk)))
         return sorted(revs)
 
 
