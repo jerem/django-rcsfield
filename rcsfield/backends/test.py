@@ -124,8 +124,6 @@ class TestBackend(BaseBackend):
         fetch revision ``rev`` of entity identified by ``key``.
 
         """
-        if rev.lower() == 'head':
-            return self.repo[key]
         return self.repo.get(key, rev=rev)
 
 
@@ -134,7 +132,12 @@ class TestBackend(BaseBackend):
         commit changed ``data`` to the entity identified by ``key``.
 
         """
-        self.repo[key] = data
+        try:
+            old = self.repo[key]
+        except KeyError:
+            old = ''
+        if data != old:
+            self.repo[key] = data
 
         
     def get_revisions(self, key):
