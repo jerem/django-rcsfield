@@ -141,7 +141,7 @@ class TextMultipleObjectsOneRepo(TestCase):
         
         # this test fails as documented in issue #11
         # enable it after fixing the issue
-        #self.assertEquals(obj1.get_changed_revisions(), [1,3,4])
+        self.assertEquals(obj1.get_changed_revisions(), [1,3,4])
 
         
         

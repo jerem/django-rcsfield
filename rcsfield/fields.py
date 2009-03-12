@@ -78,10 +78,13 @@ class RcsTextField(models.TextField):
         changed.
 
         """
-        return backend.get_revisions(self.rcskey_format % (instance._meta.app_label,
+        revs = []
+        for field in instance._meta.fields:
+            revs.extend(backend.get_revisions(self.rcskey_format % (instance._meta.app_label,
                                                            instance.__class__.__name__,
                                                            field.attname,
-                                                           instance.pk))
+                                                           instance.pk)))
+        return sorted(revs)
 
 
     def get_FIELD_revisions(self, instance, field):
