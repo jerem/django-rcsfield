@@ -73,10 +73,9 @@ class RcsTextField(models.TextField):
 
     def get_changed_revisions(self, instance, field):
         """
-        FIXME: for now this returns the same as get_FIELD_revisions, later
-        on it should return all revisions where _any_ rcsfield on the model
+        Returns all revisions at which some Rcs*Field on the model instance
         changed.
-
+        
         """
         revs = []
         for field in instance._meta.fields:

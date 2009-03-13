@@ -111,11 +111,13 @@ class TestBackend(BaseBackend):
     Rcsfield backend used for testing.
 
     """
-
-    def initial(self, prefix):
+    def __init__(self):
         """
         Set up a testrepo
         """
+        self.repo = VersionizedDict()
+
+    def initial(self, prefix):
         self.repo = VersionizedDict()
 
 
@@ -124,6 +126,10 @@ class TestBackend(BaseBackend):
         fetch revision ``rev`` of entity identified by ``key``.
 
         """
+        try:
+            rev = int(rev)
+        except:
+            pass
         return self.repo.get(key, rev=rev)
 
 
