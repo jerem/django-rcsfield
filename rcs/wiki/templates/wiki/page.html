@@ -1,0 +1,16 @@
+{% extends "wiki/base.html" %}
+{% load wikify rest historytrail i18n %}
+{% block pagetitle %}{{ page.slug }} {{ block.super }}{% endblock %} 
+  
+{% block content %}
+	{{ page.content|restructuredtext|wikify|safe }}
+	<div class="center">
+		<a href="{% url wiki_edit page.slug %}">{% trans "Edit" %}</a> &nbsp;|&nbsp; 
+		<a href="?plain" rel="nofollow">{% trans "View plain" %}</a> &nbsp;|&nbsp; 
+		<a href="{% url wiki_list %}">{% trans "All pages" %}</a> &nbsp;|&nbsp; 
+		<a href="{% url wiki_index %}">{% trans "Home" %}</a>
+	</div>
+{% endblock %}
+{% block revisions %}  
+	<p>{% trans "Showing" %}: <a rel="nofollow" href="">{{ rev }}</a>,  {% trans "History" %}: {% historytrail page 12 %}</p>  
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "wiki/base.html" %}
+{% load i18n %} 
+{% block pagetitle %}{% trans "All pages" %} {{ block.super }}{% endblock %} 
+
+{% block content %}
+	<h1>{% trans "All pages" %}</h1>
+	<ul>
+		{% for page in pages %} 
+		<li><a href="{{ page.get_absolute_url }}">{{ page.slug|escape }}</a></li>
+		{% endfor %} 
+	</ul>
+	<a href="{% url wiki_recent %}">{% trans "View recent changes" %}</a>
+{% endblock %}

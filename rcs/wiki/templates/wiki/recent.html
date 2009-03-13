@@ -1,0 +1,12 @@
+{% extends "wiki/base.html" %}
+{% load i18n %} 
+{% block pagetitle %}{% trans "Recent changes" %} {{ block.super }}{% endblock %}
+
+{% block content %}
+	<h1>{% trans "Recent changes" %}</h1>
+	<ul>
+		{% for page in last %} 
+		<li><a href="{{ page.get_absolute_url }}">{{ page.slug|escape }}</a> ({% blocktrans with page.last_mod|timesince as since and  page.mod_by as who %}change {{ since }} ago by {{ who }}{% endblocktrans %})</li>
+		{% endfor %} 
+	</ul>	
+{% endblock %}

@@ -1,0 +1,16 @@
+<html>
+<head>
+	<title>{% block pagetitle %}rcs.wiki{% endblock %}</title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	{% block extrahead %}{% endblock %}
+	{# This is a dead simple base template. It only exists to show you #}
+	{# the used blocks and to make it easy to customize the wiki by    #}
+	{# just replacing one template (add 'wiki/base.html' to one of     #}
+	{# your project's TEMPLATE_DIRS                                    #} 
+</head>
+<body>
+	{% block content %}{% endblock %}
+	<hr />
+	{% block revisions %}{% endblock %}    
+</body>
+</html>

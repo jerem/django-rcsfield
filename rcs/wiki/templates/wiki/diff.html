@@ -1,0 +1,12 @@
+{% extends "wiki/base.html" %}
+{% load wikify rest historytrail i18n %} 
+{% block pagetitle %}{{ page.slug }} {{ block.super }}{% endblock %}
+
+{% block content %}
+	<div style="overflow:auto">
+	{{ x|restructuredtext|safe }}
+	</div> 
+{% endblock %}
+{% block revisions %}  
+	<p>{% trans "Showing" %}: <a rel="nofollow" href="">diff {{ rev_a }}&rarr;{{ rev_b }}</a>,  {% trans "History" %}: {% historytrail page 12 %}</p>  
+{% endblock %}

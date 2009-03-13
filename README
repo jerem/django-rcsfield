@@ -8,3 +8,66 @@ Currently this app implements Subversion, Git and Bazaar backends for
 versionizing the content of the field. Other backends are planned.
 
 The `HEAD` revision always stays in the db for maximum performance.
+
+
+Example Wiki app
+----------------
+
+An example usage of django-rcsfield is provided in the reuseable
+wiki app ``rcs.wiki``, which also lives in this repository.
+
+To try django-rcsfield with the wiki create an empty django project with::
+
+    django-admin.py startproject example
+    
+Edit example/settings.py and add ``rcsfield`` and ``rcs.wiki`` to 
+INSTALLED_APPS::
+
+    INSTALLED_APPS = (
+        ...
+        'rcsfield',
+        'rcs.wiki',
+    )
+    
+Still in the settings.py specify which backend you want to use for versionizing
+the contents. The most simple solutions would be to start with the test-backend,
+which just stores it's history in Ram. This means that everytime the runserver
+reloads due to code changes all history is lost. To use the test-backend add::
+
+    RCS_BACKEND = 'test'
+    
+to example/settings.py. Other options are:
+
+* bazaar::
+
+      RCS_BACKEND = 'bzr' # uses bzrlib
+      BZR_WC_PATH = '/tmp/rcsfield-repo/' # where the repo should be created
+      
+* svn::
+
+      RCS_BACKEND = 'svn' # uses pysvn
+      SVN_ROOT = 'http://example.com/svn/repo-name/' # how to reach the repo
+      SVN_WC_PATH = '/tmp/rcsfield-repo/' # where to checkout the working-copy
+      
+* git::
+
+      RCS_BACKEND = 'gitcore' # uses git-python
+      GIT_REPO_PATH = '/tmp/rcsfield-repo/' # where the repo should be created
+
+
+Edit example/urls.py to include the wiki url-conf:
+
+    urlpatterns = patterns('',
+        ...
+        (r'^wiki/', include('rcs.wiki.urls')),
+    )
+    
+Then run ``manage.py syncdb`` and ``manage.py runserver`` and start
+using the wiki. Running ``syncdb`` will also make sure, that the repo is
+set up for all uses Rcs-Fields used in the models.
+
+Currently the Wiki requires a login to edit pages (and it will redirect you
+to the edit-view of the index page if the wiki is empty), as no login-view
+is bundled, please use contrib.admin to login and the start editing pages in
+the wiki.
+

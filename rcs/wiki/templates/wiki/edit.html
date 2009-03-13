@@ -1,0 +1,17 @@
+{% extends "wiki/base.html" %}
+{% load wikify rest i18n %} 
+{% block pagetitle %}{{ page.slug }} {{ block.super }}{% endblock %}
+
+{% block content %}
+	{% if preview %}
+		<h1>{% blocktrans with page.slug as name %}Preview: {{ name }}{% endblocktrans %}</h1>
+		{{ page.content|restructuredtext|wikify|safe }}	
+	{% endif %} 		
+	<h1>{% blocktrans with page.slug as name %}Edit: {{ name }}{% endblocktrans %}</h1>
+	<form action="{{ page.get_absolute_url }}edit/" method="post">
+		<textarea style="font-family:monospace" name="content" cols="96" rows="30">{{ page.content }}</textarea><br />
+		<input type="submit" name="save" value="{% trans "Save" %}" />&nbsp;
+		<input type="submit" name="preview" value="{% trans "Preview" %}" />&nbsp;
+		<input type="button" value="{% trans "Cancel" %}" onclick="window.location='{{ page.get_absolute_url }}'" />
+	</form>
+{% endblock %}
