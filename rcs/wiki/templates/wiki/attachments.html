@@ -1,9 +1,8 @@
-<html>
-<head>
-	<title>Attachments for {{ page }}</title>
-</head>
-<body>
-<h2>Attachments for {{ page }}</h2>
+{% extends "wiki/base.html" %}
+{% load i18n %}
+  
+{% block content %} 
+<h2>{% blocktrans with page as page %}Attachments for {{ page }}{% endblocktrans %}</h2>
 <ul>
 	{% for obj in attachments %}
 	<li>
@@ -11,10 +10,9 @@
 	</li>
 	{% endfor %}
 </ul>
-<h3>New Attachment</h3>
+<h3>{% trans "New Attachment" %}</h3>
 <form action="" method="post" enctype="multipart/form-data">
 	{{ form }}
-	<input type="submit" value="upload"/>
+	<input type="submit" value="{% trans "upload" %}"/>
 </form>
-</body>
-</html> 
+{% endblock %} 
