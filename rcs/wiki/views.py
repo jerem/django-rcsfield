@@ -7,6 +7,7 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_page
 from rcs.wiki.models import WikiPage
+from rcs.wiki.forms import UploadForm
 
 
 
@@ -103,3 +104,18 @@ def diff(request, slug, rev_a, rev_b):
         x = x + "\t" + line
     x = x + "\n\n"
     return render_to_response('wiki/diff.html', locals(), context_instance=RequestContext(request))
+
+def attachments(request, slug, form_class=UploadForm):
+    page = get_object_or_404(WikiPage, slug__exact=slug)
+    if request.method == 'POST':
+        form = form_class(request.POST, request.FILES)
+        if form.is_valid():
+            attachment = form.save(commit=False)
+            attachment.page = page
+            attachment.save()
+            return HttpResponseRedirect('.')
+    else:
+        form = form_class()
+    attachments = page.wikiattachment_set.all()
+    return render_to_response('wiki/attachments.html', locals(), context_instance=RequestContext(request))
+    

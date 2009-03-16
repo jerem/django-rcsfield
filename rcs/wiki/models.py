@@ -18,3 +18,16 @@ class WikiPage(models.Model):
     @models.permalink    
     def get_absolute_url(self):
         return "wiki_page", [self.slug,]
+        
+        
+        
+class WikiAttachment(models.Model):
+    file = models.FileField(upload_to='attachments/')
+    last_mod = models.DateTimeField(auto_now=True)
+    page = models.ForeignKey(WikiPage, blank=True, null=True)
+ 
+    def __unicode__(self):
+        return self.file.name
+         
+    def get_absolute_url(self):
+        return self.file.url
