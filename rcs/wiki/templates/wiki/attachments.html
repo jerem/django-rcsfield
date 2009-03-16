@@ -1,3 +1,8 @@
+<html>
+<head>
+	<title>Attachments for {{ page }}</title>
+</head>
+<body>
 <h2>Attachments for {{ page }}</h2>
 <ul>
 	{% for obj in attachments %}
@@ -10,4 +15,6 @@
 <form action="" method="post" enctype="multipart/form-data">
 	{{ form }}
 	<input type="submit" value="upload"/>
-</form> 
+</form>
+</body>
+</html> 
