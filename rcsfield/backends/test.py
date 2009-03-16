@@ -116,6 +116,9 @@ class TestBackend(BaseBackend):
         Set up a testrepo
         """
         self.repo = VersionizedDict()
+        from django.conf import settings
+        self.location = settings.MEDIA_ROOT
+    
 
     def initial(self, prefix):
         self.repo = VersionizedDict()

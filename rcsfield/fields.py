@@ -85,7 +85,7 @@ class RcsTextField(models.TextField):
                                                     instance.__class__.__name__,
                                                     field.attname,
                                                     instance.pk)))
-        return sorted(revs)
+        return list(reversed(sorted(revs)))
 
 
     def get_FIELD_revisions(self, instance, field):
