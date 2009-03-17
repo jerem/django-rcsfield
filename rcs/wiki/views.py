@@ -6,6 +6,7 @@ from django import template
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_page
+from django.utils.encoding import force_unicode
 from rcs.wiki.models import WikiPage
 from rcs.wiki.forms import UploadForm
 
@@ -99,10 +100,10 @@ def diff(request, slug, rev_a, rev_b):
     page = get_object_or_404(WikiPage, slug__exact=slug)
     rev = WikiPage.objects.rev(rev_b).get(slug=slug)
     diff = rev.get_content_diff(rev_a)
-    x = ".. sourcecode:: diff\n\t\n"
+    x = u".. sourcecode:: diff\n\t\n"
     for line in diff:
-        x = x + "\t" + line
-    x = x + "\n\n"
+        x = x + u"\t" + force_unicode(line)
+    x = x + u"\n\n"
     return render_to_response('wiki/diff.html', locals(), context_instance=RequestContext(request))
 
 def attachments(request, slug, form_class=UploadForm):
