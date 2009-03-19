@@ -155,7 +155,7 @@ class TestBackend(BaseBackend):
         Revision Numbers are integers starting at 1.
 
         """
-        return self.repo.get_revs_for_key(key)
+        return list(reversed(self.repo.get_revs_for_key(key)))
 
 
     def move(self, key_from, key_to):

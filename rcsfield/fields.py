@@ -1,11 +1,9 @@
+import difflib
 from django.db import models
 from django.conf import settings
 from django.db.models import signals, TextField
 from django.utils.functional import curry
 from django.utils import simplejson as json
-
-from manager import RevisionManager
-
 from rcsfield.backends import backend
 from rcsfield.widgets import RcsTextFieldWidget, JsonWidget
 
@@ -41,12 +39,8 @@ class RcsTextField(models.TextField):
         versionized content in the model-definition.
 
         """
-        if kwargs.get('rcskey_format', False):
-            self.rcskey_format = kwargs['rcskey_format']
-            del kwargs['rcskey_format']
-            #TODO: check if the string has the correct format
-        else:
-            self.rcskey_format = "%s/%s/%s/%s.txt"
+        #TODO: check if the string has the correct format
+        self.rcskey_format = kwargs.pop('rcskey_format', "%s/%s/%s/%s.txt")
         self.IS_VERSIONED = True # so we can figure out that this field is versionized
         TextField.__init__(self, *args, **kwargs)
 
@@ -54,7 +48,13 @@ class RcsTextField(models.TextField):
     def get_internal_type(self):
         return "TextField"
 
-
+    def get_key(self, instance):
+        format_args = (instance._meta.app_label,
+                       instance.__class__.__name__,
+                       self.attname,
+                       instance.pk)
+        return self.rcskey_format % format_args
+        
     def post_save(self, instance=None, **kwargs):
         """
         create a file and add to the repository, if not already existing
@@ -62,13 +62,8 @@ class RcsTextField(models.TextField):
 
         """
         data = getattr(instance, self.attname)
-        key = self.rcskey_format % (instance._meta.app_label,
-                                    instance.__class__.__name__,
-                                    self.attname,instance.pk)
-        try:
-            backend.commit(key, data.encode('utf-8'))
-        except:
-            raise
+        key = self.get_key(instance)
+        backend.commit(key, data.encode('utf-8'))
 
 
     def get_changed_revisions(self, instance, field):
@@ -80,19 +75,12 @@ class RcsTextField(models.TextField):
         revs = []
         for field in instance._meta.fields:
             if hasattr(field, 'IS_VERSIONED') and field.IS_VERSIONED:
-                revs.extend(backend.get_revisions(self.rcskey_format % (
-                                                    instance._meta.app_label,
-                                                    instance.__class__.__name__,
-                                                    field.attname,
-                                                    instance.pk)))
+                revs.extend(field.get_FIELD_revisions(instance, field))
         return list(reversed(sorted(revs)))
 
 
     def get_FIELD_revisions(self, instance, field):
-        return backend.get_revisions(self.rcskey_format % (instance._meta.app_label,
-                                                           instance.__class__.__name__,
-                                                           field.attname,
-                                                           instance.pk))
+        return backend.get_revisions(self.get_key(instance))
 
 
     def get_FIELD_diff(self, instance, rev1, rev2=None, field=None):
@@ -118,33 +106,19 @@ class RcsTextField(models.TextField):
         if rev1 == rev2: #do not attempt to diff identical content for performance reasons
             return ""
 
+        key = self.get_key(instance)
         if rev2 == 'head':
-            import difflib
-            old = backend.fetch(self.rcskey_format % (instance._meta.app_label,
-                                                      instance.__class__.__name__,
-                                                      field.attname,
-                                                      instance.pk),
-                                rev1,
-                               )
-            diff = difflib.unified_diff(old.splitlines(1),
-                                       getattr(instance, field.attname).splitlines(1),
-                                       'Revision: %s' % rev1,
-                                       'Revision: %s' % getattr(instance, "%s_revision" % field.attname, 'head'),
-                                       )
+            old = backend.fetch(key, rev1)
+            diff = difflib.unified_diff(
+                    old.splitlines(1),
+                    getattr(instance, field.attname).splitlines(1),
+                    'Revision: %s' % rev1,
+                    'Revision: %s' % getattr(instance, "%s_revision" % field.attname, 'head'),
+                   )
             return diff
 
         else: #diff two arbitrary revisions
-            return backend.diff(self.rcskey_format % (instance._meta.app_label,
-                                                      instance.__class__.__name__,
-                                                      field.attname,
-                                                      instance.pk),
-                                rev1,
-                                self.rcskey_format % (instance._meta.app_label,
-                                                      instance.__class__.__name__,
-                                                      field.attname,
-                                                      instance.pk),
-                                rev2,
-                               )
+            return backend.diff(key, rev1, key, rev2)
 
     def contribute_to_class(self, cls, name):
         super(RcsTextField, self).contribute_to_class(cls, name)
@@ -153,11 +127,6 @@ class RcsTextField(models.TextField):
         setattr(cls, 'get_%s_diff' % self.name, curry(self.get_FIELD_diff, field=self))
         signals.post_save.connect(self.post_save, sender=cls)
 
-
-    #def formfield(self, **kwargs):
-    #    defaults = {'widget': RcsTextFieldWidget}
-    #    defaults.update(**kwargs)
-    #    return super(RcsTextField, self).formfield(**defaults)
 
 
 
@@ -196,10 +165,5 @@ class RcsJsonField(RcsTextField):
 
         """
         data = getattr(instance, self.attname)
-        key = self.rcskey_format % (instance._meta.app_label,
-                                    instance.__class__.__name__,
-                                    self.attname,instance.pk)
-        try:
-            backend.commit(key, json.dumps(data)) #.decode().encode('utf-8'))
-        except:
-            raise
+        key = self.get_key(instance)
+        backend.commit(key, json.dumps(data)) #.decode().encode('utf-8'))

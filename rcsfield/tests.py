@@ -73,7 +73,7 @@ class RevisionAPITestCase(TestCase):
         self.obj.save()
     
     def testListing(self):
-        self.assertEquals(self.obj.get_text_revisions(), [1,2,3])
+        self.assertEquals(self.obj.get_text_revisions(), [3,2,1])
         
     def testRetrieval(self):
         head = TextModel.objects.rev().get(pk=self.obj.pk)
@@ -96,11 +96,11 @@ class RevisionAPITestCase(TestCase):
         
         self.assertEquals(len(revs), len(TDATA.split()))
         
-        for rev, word in itertools.izip(revs, TDATA.split()):
+        for rev, word in itertools.izip(reversed(revs), TDATA.split()):
             self.assertEquals(TextModel.objects.rev(rev).get(pk=obj.pk).text, word)
             
     def test_get_changed_revisions(self):
-        self.assertEquals(self.obj.get_changed_revisions(), [1,2,3])
+        self.assertEquals(self.obj.get_changed_revisions(), [3,2,1])
         self.assertEquals(self.obj.get_changed_revisions(), self.obj.get_text_revisions())
         
         
@@ -124,8 +124,8 @@ class TextMultipleObjectsOneRepo(TestCase):
         self.assertEquals(obj1.text, TDATA3)
         self.assertEquals(obj2.text, TDATA2)
         
-        self.assertEquals(obj1.get_text_revisions(), [1,3])
-        self.assertEquals(obj2.get_text_revisions(), [2,4])
+        self.assertEquals(obj1.get_text_revisions(), [3,1])
+        self.assertEquals(obj2.get_text_revisions(), [4,2])
         self.assertEquals(obj1.get_changed_revisions(), obj1.get_text_revisions())
         self.assertEquals(obj2.get_changed_revisions(), obj2.get_text_revisions())
         
@@ -136,12 +136,12 @@ class TextMultipleObjectsOneRepo(TestCase):
         self.obj1.save()
         
         obj1 = TextModel.objects.get(pk=self.obj1.pk)
-        self.assertEquals(obj1.get_text_revisions(), [1,3])
+        self.assertEquals(obj1.get_text_revisions(), [3,1])
         self.assertEquals(obj1.get_text2_revisions(), [4])
         
         # this test fails as documented in issue #11
         # enable it after fixing the issue
-        self.assertEquals(obj1.get_changed_revisions(), [1,3,4])
+        self.assertEquals(obj1.get_changed_revisions(), [4,3,1])
 
         
         
