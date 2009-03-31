@@ -54,7 +54,12 @@ to example/settings.py. Other options are:
       RCS_BACKEND = 'gitcore' # uses git-python
       GIT_REPO_PATH = '/tmp/rcsfield-repo/' # where the repo should be created
 
+* mercurial::
 
+      RCS_BACKEND = 'hg' # uses mercurial
+      HG_REPO_PATH = '/tmp/rcsfield-repo/' # where the repo should be created
+      
+      
 Edit example/urls.py to include the wiki url-conf:
 
     urlpatterns = patterns('',
