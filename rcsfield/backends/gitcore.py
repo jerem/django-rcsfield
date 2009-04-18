@@ -107,11 +107,3 @@ class GitBackend(BaseBackend):
 
 rcs = GitBackend(settings.GIT_REPO_PATH)
 
-fetch = rcs.fetch
-commit = rcs.commit
-initial = rcs.initial
-get_revisions = rcs.get_revisions
-move = rcs.move
-diff = rcs.diff
-
-__all__ = ('fetch', 'commit', 'initial', 'get_revisions', 'move', 'diff')

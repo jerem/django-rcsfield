@@ -166,14 +166,6 @@ class TestBackend(BaseBackend):
 
 rcs = TestBackend()
 
-fetch = rcs.fetch
-commit = rcs.commit
-initial = rcs.initial
-get_revisions = rcs.get_revisions
-diff = rcs.diff
-
-__all__ = ('fetch', 'commit', 'initial', 'get_revisions', 'diff')
-
 if __name__ == '__main__':
     import doctest
     doctest.testmod()   
