@@ -20,6 +20,10 @@ def get_backend(import_path):
         if RCS_BACKEND not in available_backends:
             raise ImproperlyConfigured("%s isn't an available revision control (rcsfield) backend. Available options are: %s" % \
                                         (RCS_BACKEND, ', '.join(map(repr, available_backends))))
+        # if the RCS_BACKEND is available in the backend directory
+        # and an ImportError is raised, don't suppress it
+        else: 
+            raise
     try:
         return getattr(mod, 'rcs')
     except AttributeError:
