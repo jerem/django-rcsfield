@@ -9,7 +9,7 @@ from django.views.decorators.cache import cache_page
 from django.utils.encoding import force_unicode
 from rcs.wiki.models import WikiPage
 from rcs.wiki.forms import UploadForm
-
+from rcs.wiki.lock import EditLock, AlreadyLocked
 
 
 def recent(request):
@@ -53,6 +53,13 @@ def page(request, slug):
 @login_required
 def edit(request, slug):
     """Process submitted page edits (POST) or display editing form (GET)"""
+    
+    try:
+        lock = EditLock(slug, 60*15, request.user)
+    except AlreadyLocked, e:
+        # already locked by: e.lock_obj[0].username
+        lock = None
+    
     if request.POST:
         try:
             page = WikiPage.objects.get(slug__exact=slug)
@@ -65,6 +72,9 @@ def edit(request, slug):
             return render_to_response('wiki/edit.html', dict(locals(), preview=True), context_instance=RequestContext(request))
         page.mod_by = request.user
         page.save()
+        # release the edit lock, if we had one
+        if lock is not None:
+            lock.release()
         request.session['purge'] = page.slug
         return HttpResponseRedirect("/wiki/%s/" % page.slug)
     else:
