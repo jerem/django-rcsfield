@@ -26,7 +26,7 @@ def initial_checkout(sender, created_models, verbosity, **kwargs):
                 if sender_name == app_label:
                     if verbosity >= 1:
                         print "%s found in %s.models.%s" % (RcsTextField.__name__, sender_name, model.__name__)
-                        print "Will run init procedure for %s backend" % backend.__name__
+                        print "Will run init procedure for %s backend" % backend.__module__.split('.')[-1]
                     backend.initial("%s/%s/%s" % (app_label, model.__name__, field.name))
 
 signals.post_syncdb.connect(initial_checkout)
