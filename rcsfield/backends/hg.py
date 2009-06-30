@@ -66,7 +66,7 @@ class MercurialBackend(BaseBackend):
             fobj = open(os.path.join(self.location, key), 'w')
         except IOError:
             #parent directory seems to be missing
-            os.makedirs(os.dirname(os.path.join(self.location, key)))
+            os.makedirs(os.path.dirname(os.path.join(self.location, key)))
             return self.commit(key, data)
         fobj.write(data)
         fobj.close()
